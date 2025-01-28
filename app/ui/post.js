@@ -12,6 +12,7 @@ export default ({content, url}) => {
                     className=" rounded-full w-4"
                     width={24}
                     height={24} alt="Avatar"/>
+                    alt={'partirUnBesoYUnaFlor'}
                 <span>{nombreUsuario}</span>
                 <span>88 días</span>
 
