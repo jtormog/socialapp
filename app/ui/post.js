@@ -1,8 +1,9 @@
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid"
 import Link from "next/link";
 import Image from "next/image"
+import LikeButton from "./like-button";
 
-export default ({content, url}) => {
+export default ({post_id, user_id, content, url}) => {
     const nombreUsuario = "Elon Musk Fascista";
     return (
         <div className="flex flex-col gap-4 max-w-lg">
@@ -27,7 +28,7 @@ export default ({content, url}) => {
             </div>
 
             <div className="flex gap-2">
-                <HeartIcon className="w-8"></HeartIcon>
+                <LikeButton post_id={post_id} user_id={user_id}/>
                 <ChatBubbleLeftIcon className="w-8"></ChatBubbleLeftIcon>
             </div>
 

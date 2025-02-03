@@ -8,3 +8,10 @@ export async function createPost(formData) {
 
     sql`INSERT INTO POSTS(content, url) VALUES(${formData.get('content')}, ${url})`
 }
+
+export async function insertLike(user_id, post_id) {
+    sql `INSERT INTO LIKES (user_id, post_id) VALUES ( 
+        ${user_id},
+        ${post_id}
+    )`
+}
