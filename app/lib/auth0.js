@@ -14,13 +14,13 @@ export const auth0 = new Auth0Client({
             console.log(e);
         }
 
-        const user_id = (await sql`SELECT user_id FROM USERS WHERE email=${email}`).rows[0].user
+        const user_id = (await sql`SELECT user_id FROM USERS WHERE email=${email}`).rows[0].user_id
 
         return {
             ...session,
             user :{
                 ...session.user,
-                user_id : user_id,
+                user_id: user_id,
             },
         }
 
