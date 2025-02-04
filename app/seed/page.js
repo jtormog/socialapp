@@ -1,9 +1,11 @@
 import { sql } from "@vercel/postgres"
 
 export default async () => {
+
+    await sql`DROP TABLE IF EXISTS LIKES, USERS, POSTS`
     
     await sql`CREATE TABLE IF NOT EXISTS USERS(
-        user_id UUID DEFAULT uuid_generate_V4() PRIMARY KEY,
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
         username text,
         name text,
         picture text,
@@ -11,15 +13,16 @@ export default async () => {
     )`;
     
     await sql`CREATE TABLE IF NOT EXISTS POSTS(
-    post_id UUID DEFAULT uuid_generate_V4() PRIMARY KEY,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content TEXT,
-    url TEXT 
+    url TEXT
     )`;
 
     await sql`CREATE TABLE IF NOT EXISTS LIKES (
-        user_id UUID,
-        post_id UUID
-    )`
+        user_id UUID REFERENCES USERS(id),
+        post_id UUID REFERENCES POSTS(id),
+        PRIMARY KEY (user_id, post_id)
+    )`;
 
     return <p>Database seed the guay</p>
 }

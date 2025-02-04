@@ -15,3 +15,8 @@ export async function insertLike(user_id, post_id) {
         ${post_id}
     )`
 }
+
+export async function removeLike(user_id, post_id) {
+    sql `REMOVE FROM LIKE
+    WHERE post_id = ${post_id} AND user_id = ${user_id}`
+}
