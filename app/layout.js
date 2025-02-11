@@ -3,6 +3,8 @@ import "./globals.css";
 import Navbar from "./ui/navbar";
 import { auth0 } from "./lib/auth0";
 
+//
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
