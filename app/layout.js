@@ -25,8 +25,7 @@ export default async function RootLayout({ children }) {
     return (
       <html>
         <body>
-          <h1>Ta mare quan pixa fa clotet?</h1>
-          <a href="/auth/login">I la figa ta tia te pels en la esquena?</a>
+          <a href="/auth/login">Login</a>
         </body>
       </html>
     )
@@ -36,8 +35,7 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
       >
-        <h1>{session.user.name}</h1>
-        <a href="/auth/logout">Ojos que no ven, caguera que xafes</a>
+        <a href="/auth/logout">Logout</a>
         <Navbar />
         {children}
       </body>
