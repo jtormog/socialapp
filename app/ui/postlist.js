@@ -5,7 +5,13 @@ import { auth0 } from "../lib/auth0";
 export default async () => {
 
     //lanzar las dos consultas a la vez
-    const user_id = (await auth0.getSession()).user.user_id;    
+ 
+    const user_id = (await auth0.getSession()).user?.user_id;    
+
+    if (!user_id) {
+        return <div>Not logged in</div>
+    }
+    
     const posts = await getPosts();
     const likes = await getLikes(user_id);
 
