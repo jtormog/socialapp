@@ -14,6 +14,6 @@ export default ({ href, children, icon }) => {
                 "font-bold pointer-events-none text-blue-500": currentPath === href
             }
         )}>
-            <BeakerIcon className="w-4"/><span className="hidden lg:block">{children}</span></Link>
+            <objeto.icon className="w-4"/><span className="hidden lg:block">{children}</span></Link>
     )
 }

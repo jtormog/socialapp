@@ -19,7 +19,11 @@ export default () => {
                     width={0}
                     height={0}
                     sizes="100vw"
-                    className="w-auto h-sm"
+                    className="w-auto h-sm mx-auto"
+                    style={{
+                        maxHeight: "300px",
+                        objectFit: "contain"
+                    }}
                 />
             </label>
             <input id='myfs' type="file" hidden accept="image/png, image/jpg, image/jpeg" name="media" required onChange={preview} />

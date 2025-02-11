@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./ui/navbar";
 import { auth0 } from "./lib/auth0";
+import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/20/solid";
 
 //
 
@@ -27,7 +28,10 @@ export default async function RootLayout({ children }) {
     return (
       <html>
         <body>
-          <a href="/auth/login">Login</a>
+          <div className="flex flex-col items-center justify-center h-screen">
+            <h1 className="text-4xl">Logueate, maricón</h1>
+          <a href="/auth/login"><ArrowLeftEndOnRectangleIcon className="w-10"/></a>
+          </div>
         </body>
       </html>
     )
@@ -37,7 +41,6 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
       >
-        <a href="/auth/logout">Logout</a>
         <Navbar />
         {children}
       </body>
