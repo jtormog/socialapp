@@ -1,7 +1,6 @@
 import { sql } from "@vercel/postgres";
 
 export async function getPosts() {
-
     return (await sql`SELECT 
         POSTS.post_id, 
         content, 
@@ -20,7 +19,7 @@ export async function getPosts() {
         url, 
         POSTS.user_id, 
         username
-`).rows
+    `).rows;
 }
 
 export async function getPost(post_id) {
@@ -44,16 +43,22 @@ export async function getPost(post_id) {
         url, 
         POSTS.user_id, 
         username 
-`).rows;
+    `).rows;
 }
 
-
-
 export async function getLikes(user_id) {
-    return (await sql`SELECT post_id FROM LIKES
-        WHERE user_id = ${user_id}`).rows
+    return (await sql`
+        SELECT post_id 
+        FROM LIKES
+        WHERE user_id = ${user_id}
+    `).rows;
 }
 
 export async function getLike(user_id, post_id) {
-    return (await sql`SELECT post_id FROM LIKES WHERE user_id = ${user_id} AND post_id=${post_id}`).rows;
+    return (await sql`
+        SELECT post_id 
+        FROM LIKES 
+        WHERE user_id = ${user_id} 
+        AND post_id = ${post_id}
+    `).rows;
 }
