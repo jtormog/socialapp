@@ -1,4 +1,4 @@
-import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid"
+import { ChatBubbleLeftIcon} from "@heroicons/react/20/solid"
 import Link from "next/link";
 import Image from "next/image"
 import LikeButton from "./like-button";

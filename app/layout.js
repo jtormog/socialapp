@@ -29,7 +29,7 @@ export default async function RootLayout({ children }) {
       <html>
         <body>
           <div className="flex flex-col items-center justify-center h-screen">
-            <h1 className="text-4xl">Logueate, maricón</h1>
+            <h1 className="text-4xl">Logueate, o te pego</h1>
           <a href="/auth/login"><ArrowLeftEndOnRectangleIcon className="w-10"/></a>
           </div>
         </body>
