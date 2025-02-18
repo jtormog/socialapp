@@ -30,6 +30,7 @@ export async function getPost(post_id) {
         url, 
         POSTS.user_id, 
         username, 
+        created_at,
         count(*) as num_likes 
     FROM 
         POSTS 

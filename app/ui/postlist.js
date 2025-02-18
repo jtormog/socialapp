@@ -7,7 +7,6 @@ export default async ({posts, user_id, likes}) => {
             {
                 posts.map(post => <Post 
                     key={post.post_id}
-
                     post={post}
                     user_id={user_id} 
                     isLikedInitial={likes.find(like => like.post_id === post.post_id)}
