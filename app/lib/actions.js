@@ -30,3 +30,17 @@ export async function removeLike(user_id, post_id) {
     sql `DELETE FROM LIKES
     WHERE post_id = ${post_id} AND user_id = ${user_id}`
 }
+
+export async function createComment(post_id, content) {
+    const user_id = (await auth0.getSession()).user.user_id;
+    await sql`INSERT INTO COMMENTS (content, user_id, post_id) 
+    VALUES (${content}, ${user_id}, ${post_id})`;
+    revalidatePath(`/post/${post_id}`);
+}
+
+export async function createReply(post_id, parent_id, content) {
+    const user_id = (await auth0.getSession()).user.user_id;
+    await sql`INSERT INTO COMMENTS (content, user_id, post_id, parent_id) 
+    VALUES (${content}, ${user_id}, ${post_id}, ${parent_id})`;
+    revalidatePath(`/post/${post_id}`);
+}

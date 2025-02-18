@@ -2,6 +2,8 @@ import { ChatBubbleLeftIcon} from "@heroicons/react/20/solid"
 import Link from "next/link";
 import Image from "next/image"
 import LikeButton from "./like-button";
+import CommentList from "./comment-list";
+import { createComment, createReply } from "../lib/actions";
 
 const getTimeAgo = (created_at) => {
     const postDate = new Date(created_at);
@@ -46,7 +48,7 @@ export default ({user_id, post, isLikedInitial}) => {
         <div className="flex flex-col gap-4 max-w-lg">
             <div className="flex gap-2">
                 <Image src={post.picture}
-                    className=" rounded-full w-4"
+                    className=" rounded-full"
                     width={24}
                     height={24} alt="partirUnBesoYUnaFlor"/>
                 <span>{post.username}</span>
@@ -57,7 +59,7 @@ export default ({user_id, post, isLikedInitial}) => {
             <Link href={`/post/${post.post_id}`}>
                 <Image src={post.url} 
                     alt="test"
-                    className=""
+                    className="w-auto h-sm mx-auto"
                     width={284}
                     height={284}
                 />
@@ -74,12 +76,15 @@ export default ({user_id, post, isLikedInitial}) => {
                 <p><span className="me-2">{post.username}</span>{post.content}</p>
             </div>
 
-            <div>
-                <Link href="#">Ver los 88 comentarios</Link>
-            </div>
-            <div>
-                <input className="dark:bg-neutral-950 w-full outline-none" placeholder="Añade un comentario"></input>
-            </div>
+            <CommentList 
+                comments={post.comments || []}
+                onAddComment={(content) => {
+                    createComment(post.post_id, content);
+                }}
+                onReply={(commentId, content) => {
+                    createReply(post.post_id, commentId, content);
+                }}
+            />
         </div>
     )
 }
