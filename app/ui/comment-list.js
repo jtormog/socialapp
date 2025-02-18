@@ -4,6 +4,41 @@ import { useState } from 'react'
 import Image from 'next/image'
 import CommentInput from './comment-input'
 
+const getTimeAgo = (created_at) => {
+    const postDate = new Date(created_at);
+    const now = new Date();
+    const diffInMillis = now - postDate;
+    const seconds = Math.floor(diffInMillis / 1000);
+    const MINUTES = 60;
+    const HOURS = 60 * MINUTES;
+    const DAYS = 24 * HOURS;
+    const WEEKS = 7 * DAYS;
+    const MONTHS = 4 * WEEKS;
+    const YEARS = 12 * MONTHS;
+
+    if (seconds < MINUTES) {
+        return `unos instantes`;
+    } else if (seconds < HOURS) {
+        const minutes = Math.floor(seconds / MINUTES);
+        return `${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+    } else if (seconds < DAYS) {
+        const hours = Math.floor(seconds / HOURS);
+        return `${hours} ${hours === 1 ? 'hora' : 'horas'}`;
+    } else if (seconds < WEEKS) {
+        const days = Math.floor(seconds / DAYS);
+        return `${days} ${days === 1 ? 'día' : 'días'}`;
+    } else if (seconds < MONTHS) {
+        const weeks = Math.floor(seconds / WEEKS);
+        return `${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+    } else if (seconds < YEARS) {
+        const months = Math.floor(seconds / MONTHS);
+        return `${months} ${months === 1 ? 'mes' : 'meses'}`;
+    } else {
+        const years = Math.floor(seconds / YEARS);
+        return `${years} ${years === 1 ? 'año' : 'años'}`;
+    }
+};
+
 const Comment = ({ comment, onReply }) => {
     const [showReplyInput, setShowReplyInput] = useState(false)
 
@@ -11,7 +46,7 @@ const Comment = ({ comment, onReply }) => {
         <div className="ml-4 mt-2">
             <div className="flex items-start gap-2">
                 <Image 
-                    src={comment.user_picture || '/default-avatar.png'}
+                    src={comment.user_picture}
                     width={24}
                     height={24}
                     className="rounded-full"
@@ -29,7 +64,7 @@ const Comment = ({ comment, onReply }) => {
                         >
                             Responder
                         </button>
-                        <span className="text-xs text-gray-500">{comment.created_at}</span>
+                        <span className="text-xs text-gray-500">Hace {getTimeAgo(comment.created_at)}</span>
                     </div>
                     {showReplyInput && (
                         <div className="mt-2">

@@ -1,3 +1,5 @@
+'use client'
+
 import { ChatBubbleLeftIcon} from "@heroicons/react/20/solid"
 import Link from "next/link";
 import Image from "next/image"
@@ -9,7 +11,6 @@ const getTimeAgo = (created_at) => {
     const postDate = new Date(created_at);
     const now = new Date();
     const diffInMillis = now - postDate;
-    console.log(postDate, now);
     const seconds = Math.floor(diffInMillis / 1000);
     const MINUTES = 60;
     const HOURS = 60 * MINUTES;
@@ -41,8 +42,16 @@ const getTimeAgo = (created_at) => {
     }
 };
 
-export default ({user_id, post, isLikedInitial}) => {
+export default ({user_id, post, isLikedInitial, comments}) => {
     const timeAgo = getTimeAgo(post.created_at);
+
+    const handleAddComment = async (content) => {
+        await createComment(post.post_id, content);
+    };
+
+    const handleReply = async (commentId, content) => {
+        await createReply(post.post_id, commentId, content);
+    };
 
     return (
         <div className="flex flex-col gap-4 max-w-lg">
@@ -77,13 +86,9 @@ export default ({user_id, post, isLikedInitial}) => {
             </div>
 
             <CommentList 
-                comments={post.comments || []}
-                onAddComment={(content) => {
-                    createComment(post.post_id, content);
-                }}
-                onReply={(commentId, content) => {
-                    createReply(post.post_id, commentId, content);
-                }}
+                comments={comments || []}
+                onAddComment={handleAddComment}
+                onReply={handleReply}
             />
         </div>
     )

@@ -66,7 +66,6 @@ export async function getLike(user_id, post_id) {
 }
 
 export async function getPostComments(post_id) {
-    // First, get all top-level comments (no parent_id)
     const comments = await sql`
         SELECT 
             c.comment_id,
@@ -81,8 +80,6 @@ export async function getPostComments(post_id) {
         AND c.parent_id IS NULL
         ORDER BY c.created_at DESC
     `;
-
-    // For each top-level comment, get its replies
     for (const comment of comments.rows) {
         comment.replies = await getReplies(comment.comment_id);
     }
