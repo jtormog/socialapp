@@ -2,6 +2,8 @@ import { sql } from "@vercel/postgres"
 
 export default async () => {
 
+    await sql`SET timezone = 'UTC'`;
+    
     await sql`DROP TABLE IF EXISTS LIKES, USERS, POSTS`
     
     await sql`CREATE TABLE IF NOT EXISTS USERS(
@@ -16,7 +18,8 @@ export default async () => {
     post_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content TEXT,
     url TEXT,
-    user_id UUID REFERENCES USERS(user_id)
+    user_id UUID REFERENCES USERS(user_id),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     )`;
 
     await sql`CREATE TABLE IF NOT EXISTS LIKES (
