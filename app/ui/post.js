@@ -1,5 +1,5 @@
 'use client'
-
+import { useState } from "react";
 import { ChatBubbleLeftIcon} from "@heroicons/react/20/solid"
 import Link from "next/link";
 import Image from "next/image"
@@ -44,6 +44,7 @@ const getTimeAgo = (created_at) => {
 
 export default ({user_id, post, isLikedInitial, comments}) => {
     const timeAgo = getTimeAgo(post.created_at);
+    const [likeCount, setLikeCount] = useState(post.num_likes || 0);
 
     const handleAddComment = async (content) => {
         await createComment(post.post_id, content);
@@ -76,10 +77,17 @@ export default ({user_id, post, isLikedInitial, comments}) => {
             </div>
 
             <div className="flex gap-2">
-                <LikeButton post_id={post.post_id} user_id={user_id} isLikedInitial={isLikedInitial}/>
+                <LikeButton 
+                    post_id={post.post_id} 
+                    user_id={user_id} 
+                    isLikedInitial={isLikedInitial}
+                    onLikeChange={(isLiked) => {
+                        setLikeCount(prevCount => isLiked ? +prevCount + 1 : prevCount - 1);
+                    }}
+                />
                 <ChatBubbleLeftIcon className="w-8"/>
             </div>
-            <span>{post.num_likes} Me gusta</span>
+            <span>{likeCount} Me gusta</span>
 
             <div>
                 <p><span className="me-2">{post.username}</span>{post.content}</p>

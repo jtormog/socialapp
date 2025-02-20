@@ -4,17 +4,18 @@ import { insertLike, removeLike } from "../lib/actions";
 import clsx from "clsx";
 import { useState } from "react";
 
-export default ({ post_id, user_id, isLikedInitial }) => {
-
+export default ({ post_id, user_id, isLikedInitial, onLikeChange }) => {
     const [isLiked, setIsLiked] = useState(isLikedInitial);
 
     function toggleLike(){
-        if (isLiked){
-            removeLike(user_id, post_id);
-        }else{
+        const newLikedState = !isLiked;
+        if (newLikedState){
             insertLike(user_id, post_id);
+        }else{
+            removeLike(user_id, post_id);
         }
-        setIsLiked(!isLiked)
+        setIsLiked(newLikedState);
+        onLikeChange?.(newLikedState)
     }
 
     return (
