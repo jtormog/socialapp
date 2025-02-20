@@ -2,12 +2,19 @@
 
 import { useState } from "react";
 import Image from "next/image"
+import { compressImage } from "../lib/imageCompression";
 
 export default () => {
     const [image, setImage] = useState('/example.png');
 
-    function preview(e) {
-        setImage(URL.createObjectURL(e.target.files[0]));
+    async function preview(e) {
+        const file = e.target.files[0];
+        const compressedFile = await compressImage(file);
+        setImage(URL.createObjectURL(compressedFile));
+        // Replace the original file with the compressed one in the form
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(compressedFile);
+        e.target.files = dataTransfer.files;
     }
 
     return (
