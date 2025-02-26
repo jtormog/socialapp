@@ -1,5 +1,58 @@
 import { sql } from "@vercel/postgres";
 
+export async function getUserById(user_id) {
+    if (!user_id) {
+        console.error('No user_id provided to getUserById');
+        return null;
+    }
+
+    try {
+        const result = await sql`
+            SELECT user_id, username, email, picture,
+                   (SELECT COUNT(*) FROM POSTS WHERE user_id = USERS.user_id) as post_count,
+                   (SELECT COUNT(*) FROM LIKES WHERE user_id = USERS.user_id) as like_count
+            FROM USERS
+            WHERE user_id = ${user_id}
+        `;
+
+        if (!result || !result.rows || result.rows.length === 0) {
+            console.log('No user found with id:', user_id);
+            return null;
+        }
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in getUserById:', error);
+        throw new Error('Failed to fetch user data');
+    }
+}
+
+export async function getUserLogged(email) {
+    if (!email) {
+        console.error('No email provided to getUserLogged');
+        return null;
+    }
+
+    try {
+        const result = await sql`
+            SELECT user_id, username, email, picture,
+                   (SELECT COUNT(*) FROM POSTS WHERE user_id = USERS.user_id) as post_count,
+                   (SELECT COUNT(*) FROM LIKES WHERE user_id = USERS.user_id) as like_count
+            FROM USERS
+            WHERE email = ${email}
+        `;
+
+        if (!result || !result.rows || result.rows.length === 0) {
+            console.log('No user found with email:', email);
+            return null;
+        }
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in getUserLogged:', error);
+        throw new Error('Failed to fetch user data');
+    }
+}
 
 export async function getPosts() {
     return (await sql`SELECT 
@@ -24,7 +77,49 @@ export async function getPosts() {
         picture,
         POSTS.user_id, 
         username
-`).rows
+    ORDER BY 
+        POSTS.created_at DESC
+    `).rows;
+}
+
+export async function getUserPosts(username) {
+    if (!username) {
+        console.error('No username provided to getUserPosts');
+        return [];
+    }
+
+    try {
+        return (await sql`SELECT 
+            POSTS.post_id, 
+            POSTS.content, 
+            url, 
+            POSTS.user_id, 
+            picture,
+            username, 
+            POSTS.created_at,
+            count(DISTINCT LIKES.user_id) as num_likes,
+            count(DISTINCT CASE WHEN COMMENTS.parent_id IS NULL THEN COMMENTS.comment_id END) as num_comments
+        FROM 
+            POSTS 
+            JOIN USERS USING(user_id) 
+            LEFT JOIN LIKES USING(post_id)
+            LEFT JOIN COMMENTS USING(post_id)
+        WHERE 
+            username = ${username}
+        GROUP BY 
+            POSTS.post_id, 
+            POSTS.content, 
+            url, 
+            picture,
+            POSTS.user_id, 
+            username
+        ORDER BY 
+            POSTS.created_at DESC
+        `).rows;
+    } catch (error) {
+        console.error('Error fetching user posts:', error);
+        return [];
+    }
 }
 
 export async function getPost(post_id) {
@@ -130,4 +225,19 @@ export async function getReplies(parent_id) {
         replies,
         total: parseInt(total)
     };
+}
+export async function getUser(username) {
+    try {
+        const user = (await sql`
+            SELECT user_id, username, email, picture,
+                   (SELECT COUNT(*) FROM POSTS WHERE user_id = USERS.user_id) as post_count,
+                   (SELECT COUNT(*) FROM LIKES WHERE user_id = USERS.user_id) as like_count
+            FROM USERS
+            WHERE username = ${username}
+        `).rows[0];
+        return user || null;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return null;
+    }
 }

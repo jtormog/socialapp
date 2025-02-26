@@ -1,6 +1,5 @@
 'use client'
 import Link from "next/link";
-import {BeakerIcon} from "@heroicons/react/20/solid"
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
 
