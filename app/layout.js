@@ -39,7 +39,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex dark:bg-neutral-950 bg-gray-50`}
       >
         <Navbar />
         {children}

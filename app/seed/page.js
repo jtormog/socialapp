@@ -30,10 +30,10 @@ export default async () => {
 
     await sql`CREATE TABLE IF NOT EXISTS COMMENTS (
         comment_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        content TEXT NOT NULL,
+        content TEXT,
         user_id UUID REFERENCES USERS(user_id),
         post_id UUID REFERENCES POSTS(post_id),
-        parent_id UUID REFERENCES COMMENTS(comment_id),
+        parent_id UUID REFERENCES COMMENTS(comment_id) NULL,
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     )`;
 

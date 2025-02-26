@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 
-export default function CommentInput({ onSubmit, placeholder }) {
+export default function CommentInput({ onSubmit, placeholder, parentComment }) {
     const [content, setContent] = useState('')
 
     const handleSubmit = (e) => {
         e.preventDefault()
         if (content.trim()) {
-            onSubmit(content)
+            // If there's a parent comment, we'll keep its parent_id (if any) or use its own comment_id
+            const finalContent = parentComment ? `@${parentComment.username} ${content}` : content;
+            onSubmit(finalContent)
             setContent('')
         }
     }
@@ -20,12 +22,12 @@ export default function CommentInput({ onSubmit, placeholder }) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={placeholder}
-                className="flex-1 dark:bg-neutral-950 outline-none"
+                className="flex-1 dark:bg-neutral-900 outline-none"
             />
             <button
                 type="submit"
                 disabled={!content.trim()}
-                className="text-sm text-blue-500 font-semibold disabled:opacity-50"
+                className="text-sm text-blue-500 font-semibold disabled:hidden"
             >
                 Publicar
             </button>

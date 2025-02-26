@@ -1,6 +1,6 @@
 import { auth0 } from "@/app/lib/auth0";
-import { getLikes, getPost , getPostComments} from "@/app/lib/data"
-import Post from "@/app/ui/post"
+import { getLikes, getPost, getPostComments} from "@/app/lib/data"
+import PostDetail from "@/app/ui/post-detail"
 
 export default async ({ params }) => {
     const post_id = (await params).post_id;
@@ -15,7 +15,7 @@ export default async ({ params }) => {
 
     return (
         <div className="flex flex-col grow items-center gap-16 mt-28">
-            <Post
+            <PostDetail
                 key={post.post_id}
                 post={post}
                 comments={await getPostComments(post_id)}
