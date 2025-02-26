@@ -3,20 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default async function UserProfile({ params }) {
-    const username = (await params).username; // Properly await params before accessing username
+    const username = (await params).username;
     const posts = await getUserPosts(username);
     const userData = await getUser(username);
 
     if (!userData) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <h1 className="text-2xl font-semibold dark:text-gray-200">User not found</h1>
+                <h1 className="text-2xl font-semibold dark:text-gray-200">Usuario no encontrado</h1>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container py-8 relative ml-auto"> 
             <div className="flex flex-col items-center gap-8">
                 <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-2xl">
                     <Image
