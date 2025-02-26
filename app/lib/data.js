@@ -94,8 +94,8 @@ export async function getUserPosts(username) {
             POSTS.content, 
             url, 
             POSTS.user_id, 
-            picture,
-            username, 
+            USERS.picture,
+            USERS.username, 
             POSTS.created_at,
             count(DISTINCT LIKES.user_id) as num_likes,
             count(DISTINCT CASE WHEN COMMENTS.parent_id IS NULL THEN COMMENTS.comment_id END) as num_comments
@@ -105,14 +105,14 @@ export async function getUserPosts(username) {
             LEFT JOIN LIKES USING(post_id)
             LEFT JOIN COMMENTS USING(post_id)
         WHERE 
-            username = ${username}
+            USERS.username = ${username}
         GROUP BY 
             POSTS.post_id, 
             POSTS.content, 
             url, 
-            picture,
+            USERS.picture,
             POSTS.user_id, 
-            username
+            USERS.username
         ORDER BY 
             POSTS.created_at DESC
         `).rows;
@@ -134,14 +134,14 @@ export async function getPost(post_id) {
             POSTS.content, 
             url, 
             POSTS.user_id,
-            picture,
-            username,
+            u.picture,
+            u.username,
             POSTS.created_at,
             count(DISTINCT LIKES.user_id) as num_likes,
             count(DISTINCT CASE WHEN COMMENTS.parent_id IS NULL THEN COMMENTS.comment_id END) as num_comments
         FROM 
             POSTS 
-            JOIN USERS USING(user_id) 
+            JOIN USERS u ON POSTS.user_id = u.user_id
             LEFT JOIN LIKES USING(post_id)
             LEFT JOIN COMMENTS USING(post_id)
         WHERE 
@@ -150,9 +150,9 @@ export async function getPost(post_id) {
             POSTS.post_id, 
             POSTS.content, 
             url,
-            picture,
+            u.picture,
             POSTS.user_id, 
-            username 
+            u.username 
         `).rows[0];
 
         if (!post) {
@@ -226,6 +226,47 @@ export async function getReplies(parent_id) {
         total: parseInt(total)
     };
 }
+export async function getUserLikedPosts(username) {
+    if (!username) {
+        console.error('No username provided to getUserLikedPosts');
+        return [];
+    }
+
+    try {
+        return (await sql`SELECT 
+            POSTS.post_id, 
+            POSTS.content, 
+            url, 
+            POSTS.user_id, 
+            u.picture,
+            u.username, 
+            POSTS.created_at,
+            count(DISTINCT l.user_id) as num_likes,
+            count(DISTINCT CASE WHEN COMMENTS.parent_id IS NULL THEN COMMENTS.comment_id END) as num_comments
+        FROM 
+            POSTS 
+            JOIN USERS u ON POSTS.user_id = u.user_id
+            LEFT JOIN LIKES l ON POSTS.post_id = l.post_id
+            LEFT JOIN COMMENTS ON POSTS.post_id = COMMENTS.post_id
+            JOIN USERS liker ON l.user_id = liker.user_id
+        WHERE 
+            liker.username = ${username}
+        GROUP BY 
+            POSTS.post_id, 
+            POSTS.content, 
+            url, 
+            u.picture,
+            POSTS.user_id, 
+            u.username
+        ORDER BY 
+            POSTS.created_at DESC
+        `).rows;
+    } catch (error) {
+        console.error('Error fetching user liked posts:', error);
+        return [];
+    }
+}
+
 export async function getUser(username) {
     try {
         const user = (await sql`

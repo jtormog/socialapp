@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import CommentInput from './comment-input'
+import Link from 'next/link'
 
 const getTimeAgo = (created_at) => {
     const postDate = new Date(created_at);
@@ -77,12 +78,15 @@ export default function Comment({ comment, onReply, user }) {
     }, [comment.comment_id, showReplies]);
 
     const handleReply = async (commentId, content, parentComment) => {
+        const response = await fetch('/api/auth/session');
+        const userData = await response.json();
+
         const tempReply = {
             comment_id: `temp-${Date.now()}`,
             content,
             created_at: new Date().toISOString(),
-            user_picture: user?.picture,
-            username: user?.name,
+            user_picture: userData.picture,
+            username: userData.username,
             isOptimistic: true
         }
 
@@ -91,7 +95,17 @@ export default function Comment({ comment, onReply, user }) {
 
         try {
             await onReply(comment.comment_id, content)
-            // Keep the optimistic reply visible until page refresh
+            // Clear optimistic replies after successful reply creation
+            setOptimisticReplies([])
+            // Fetch the latest replies
+            const replyResponse = await fetch(`/api/replies?parentId=${comment.comment_id}`);
+            if (!replyResponse.ok) {
+                throw new Error(`Failed to fetch replies: ${replyResponse.status}`);
+            }
+            const data = await replyResponse.json();
+            if (data && Array.isArray(data.replies)) {
+                setReplies(data.replies);
+            }
         } catch (error) {
             setOptimisticReplies(prev => prev.filter(reply => reply.comment_id !== tempReply.comment_id))
             console.error('Error creating reply:', error)
@@ -112,8 +126,22 @@ export default function Comment({ comment, onReply, user }) {
                 />
                 <div className="flex-1">
                     <div className="flex gap-2 items-baseline">
-                        <span className="font-semibold text-sm dark:text-gray-200">{comment.username}</span>
-                        <p className="text-sm dark:text-gray-300">{comment.content}</p>
+                        <Link href={`/profile/${comment.username}`} className="font-semibold text-sm dark:text-gray-200 hover:underline">{comment.username}</Link>
+                        <p className="text-sm dark:text-gray-300">
+                            {comment.content.split(' ').map((word, index) => {
+                                if (word.startsWith('@')) {
+                                    const username = word.slice(1);
+                                    return (
+                                        <span key={index}>
+                                            <Link href={`/profile/${username}`} className="text-blue-500 hover:underline">
+                                                {word}
+                                            </Link>{' '}
+                                        </span>
+                                    );
+                                }
+                                return word + ' ';
+                            })}
+                        </p>
                     </div>
                     <div className="flex gap-4 mt-1">
                         <button 
@@ -155,8 +183,22 @@ export default function Comment({ comment, onReply, user }) {
                                             />
                                             <div className="flex-1">
                                                 <div className="flex gap-2 items-baseline">
-                                                    <span className="font-semibold text-sm dark:text-gray-200">{reply.username}</span>
-                                                    <p className="text-sm dark:text-gray-300">{reply.content}</p>
+                                                    <Link href={`/profile/${reply.username}`} className="font-semibold text-sm dark:text-gray-200 hover:underline">{reply.username}</Link>
+                                                    <p className="text-sm dark:text-gray-300">
+                                                        {reply.content.split(' ').map((word, index) => {
+                                                            if (word.startsWith('@')) {
+                                                                const username = word.slice(1);
+                                                                return (
+                                                                    <span key={index}>
+                                                                        <Link href={`/profile/${username}`} className="text-blue-500 hover:underline">
+                                                                            {word}
+                                                                        </Link>{' '}
+                                                                    </span>
+                                                                );
+                                                            }
+                                                            return word + ' ';
+                                                        })}
+                                                    </p>
                                                 </div>
                                                 <div className="flex gap-4 mt-1">
                                                     <button 

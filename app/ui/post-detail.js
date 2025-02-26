@@ -52,23 +52,21 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
     const [hasMore, setHasMore] = useState(comments?.total > displayedComments.length);
 
     const handleAddComment = async (content) => {
+        const tempId = `temp-${Date.now()}`;
         const newComment = {
-            comment_id: Date.now(),
+            comment_id: tempId,
             content,
             username: post.username,
             user_picture: post.picture,
             created_at: new Date().toISOString(),
-            replies: []
+            replies: [],
+            isOptimistic: true
         };
         setDisplayedComments(prev => [newComment, ...prev]);
-        await createComment(post.post_id, content);
-    };
-
-    const handleReply = async (commentId, content) => {
-        await createReply(post.post_id, commentId, content);
         
-        // Refresh the comments to get the new reply
         try {
+            await createComment(post.post_id, content);
+            // Refresh comments to get the real comment ID
             const response = await fetch(`/api/comments?postId=${post.post_id}&page=1&limit=5`);
             const newComments = await response.json();
             
@@ -78,7 +76,64 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
             setPage(1);
             setHasMore(newComments.hasMore);
         } catch (error) {
-            console.error('Error refreshing comments:', error);
+            console.error('Error creating comment:', error);
+            setDisplayedComments(prev => prev.filter(comment => comment.comment_id !== tempId));
+        }
+    };
+
+    const handleReply = async (commentId, content) => {
+        // Skip reply if the parent comment is an optimistic update
+        const parentComment = displayedComments.find(c => c.comment_id === commentId);
+        if (parentComment?.isOptimistic) {
+            console.warn('Cannot reply to an optimistic comment');
+            return;
+        }
+
+        const tempId = `temp-reply-${Date.now()}`;
+        const newReply = {
+            comment_id: tempId,
+            content,
+            username: post.username,
+            user_picture: post.picture,
+            created_at: new Date().toISOString(),
+            isOptimistic: true
+        };
+
+        // Add optimistic reply
+        setDisplayedComments(prev => prev.map(comment => {
+            if (comment.comment_id === commentId) {
+                return {
+                    ...comment,
+                    replies: [...(comment.replies || []), newReply]
+                };
+            }
+            return comment;
+        }));
+
+        try {
+            await createReply(post.post_id, commentId, content);
+            
+            // Refresh the comments to get the new reply
+            const response = await fetch(`/api/comments?postId=${post.post_id}&page=1&limit=5`);
+            const newComments = await response.json();
+            
+            if (!response.ok) throw new Error('Failed to fetch comments');
+            
+            setDisplayedComments(newComments.comments);
+            setPage(1);
+            setHasMore(newComments.hasMore);
+        } catch (error) {
+            console.error('Error creating reply:', error);
+            // Remove optimistic reply on error
+            setDisplayedComments(prev => prev.map(comment => {
+                if (comment.comment_id === commentId) {
+                    return {
+                        ...comment,
+                        replies: (comment.replies || []).filter(reply => reply.comment_id !== tempId)
+                    };
+                }
+                return comment;
+            }));
         }
     };
 
@@ -144,7 +199,9 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
 
             <CommentInput onSubmit={handleAddComment} placeholder="Añade un comentario..." />
 
-            <hr className="border-gray-200 dark:border-gray-700 my-4" />
+            {displayedComments.length > 0 && (
+                <hr className="border-gray-200 dark:border-gray-700 my-4" />
+            )}
 
             <div>
                 {displayedComments.map((comment) => (

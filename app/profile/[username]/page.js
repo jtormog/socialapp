@@ -1,10 +1,11 @@
-import { getUserPosts, getUser } from "@/app/lib/data";
+import { getUserPosts, getUser, getUserLikedPosts } from "@/app/lib/data";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function UserProfile({ params }) {
+export default async function UserProfile({ params, searchParams }) {
     const username = (await params).username;
-    const posts = await getUserPosts(username);
+    const view = (await searchParams)?.view || 'posts';
+    const posts = view === 'likes' ? await getUserLikedPosts(username) : await getUserPosts(username);
     const userData = await getUser(username);
 
     if (!userData) {
@@ -29,12 +30,18 @@ export default async function UserProfile({ params }) {
                     <div className="flex flex-col gap-4 text-center md:text-left">
                         <h1 className="text-3xl font-semibold dark:text-gray-200">{username}</h1>
                         <div className="flex flex-wrap gap-8 justify-center md:justify-start">
-                            <span className="dark:text-gray-300">
+                            <Link 
+                                href={`/profile/${username}?view=posts`}
+                                className={`dark:text-gray-300 ${view === 'posts' ? 'font-bold' : ''}`}
+                            >
                                 <strong className="dark:text-gray-200">{userData.post_count}</strong> posts
-                            </span>
-                            <span className="dark:text-gray-300">
+                            </Link>
+                            <Link 
+                                href={`/profile/${username}?view=likes`}
+                                className={`dark:text-gray-300 ${view === 'likes' ? 'font-bold' : ''}`}
+                            >
                                 <strong className="dark:text-gray-200">{userData.like_count}</strong> likes
-                            </span>
+                            </Link>
                         </div>
                     </div>
                 </div>

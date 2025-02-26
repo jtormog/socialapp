@@ -94,19 +94,19 @@ export default function PostShort({user_id, post, isLikedInitial}) {
                     className="rounded-full"
                     width={24}
                     height={24} alt="partirUnBesoYUnaFlor"/>
-                <span className="dark:text-gray-200">{post.username}</span>
+                <Link href={`/profile/${post.username}`} className="hover:underline">
+                    <span className="dark:text-gray-200">{post.username}</span>
+                </Link>
                 <span className="dark:text-gray-400">{"Hace "+timeAgo}</span>
             </div>
 
             <div className="w-full flex justify-center">
-                <Link href={`/post/${post.post_id}`}>
-                    <Image src={post.url} 
-                        alt="test"
-                        className="max-w-full h-auto object-contain max-h-[600px]"
-                        width={600}
-                        height={600}
-                    />
-                </Link>
+                <Image src={post.url} 
+                    alt="test"
+                    className="max-w-full h-auto object-contain max-h-[600px]"
+                    width={600}
+                    height={600}
+                />
             </div>
 
             <div className="flex gap-2">
@@ -118,12 +118,14 @@ export default function PostShort({user_id, post, isLikedInitial}) {
                         setLikeCount(prevCount => isLiked ? +prevCount + 1 : prevCount - 1);
                     }}
                 />
-                <ChatBubbleLeftIcon className="w-8"/>
+                <Link href={`/post/${post.post_id}`}>
+                    <ChatBubbleLeftIcon className="w-8"/>
+                </Link>
             </div>
             <span className="dark:text-gray-200">{likeCount} Me gusta</span>
 
             <div>
-                <p><span className="mr-2 dark:text-gray-200">{post.username}</span><span className="dark:text-gray-300">{post.content}</span></p>
+                <p><Link href={`/profile/${post.username}`} className="hover:underline"><span className="mr-2 dark:text-gray-200">{post.username}</span></Link><span className="dark:text-gray-300">{post.content}</span></p>
             </div>
 
             <CommentInput onSubmit={handleAddComment} placeholder="Añade un comentario..." />
