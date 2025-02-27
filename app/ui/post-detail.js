@@ -3,10 +3,10 @@ import { useState } from "react";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline"
 import CommentInput from "./comment-input"
 import Image from "next/image"
+import Link from "next/link"
 import LikeButton from "./like-button";
 import Comment from "./comment";
 import { createComment, createReply } from "../lib/actions";
-import { useRouter } from "next/navigation";
 
 
 const getTimeAgo = (created_at) => {
@@ -53,11 +53,16 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
 
     const handleAddComment = async (content) => {
         const tempId = `temp-${Date.now()}`;
+        
+        // Get current user's data from session
+        const sessionResponse = await fetch('/api/auth/session');
+        const userData = await sessionResponse.json();
+        
         const newComment = {
             comment_id: tempId,
             content,
-            username: post.username,
-            user_picture: post.picture,
+            username: userData.username,
+            user_picture: userData.picture,
             created_at: new Date().toISOString(),
             replies: [],
             isOptimistic: true
@@ -89,12 +94,16 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
             return;
         }
 
+        // Get current user's data from session
+        const sessionResponse = await fetch('/api/auth/session');
+        const userData = await sessionResponse.json();
+
         const tempId = `temp-reply-${Date.now()}`;
         const newReply = {
             comment_id: tempId,
             content,
-            username: post.username,
-            user_picture: post.picture,
+            username: userData.username,
+            user_picture: userData.picture,
             created_at: new Date().toISOString(),
             isOptimistic: true
         };
@@ -137,8 +146,6 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
         }
     };
 
-    const router = useRouter();
-
     const loadMoreComments = async () => {
         try {
             const url = new URL('/api/comments', window.location.origin);
@@ -167,7 +174,9 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
                     className="rounded-full"
                     width={24}
                     height={24} alt="partirUnBesoYUnaFlor"/>
-                <span className="dark:text-gray-200">{post.username}</span>
+                <Link href={`/profile/${post.username}`} className="hover:underline">
+                    <span className="dark:text-gray-200">{post.username}</span>
+                </Link>
                 <span className="dark:text-gray-400">{"Hace "+timeAgo}</span>
             </div>
 
@@ -194,7 +203,7 @@ export default function PostDetail({user_id, post, isLikedInitial, comments}) {
             <span className="dark:text-gray-200">{likeCount} Me gusta</span>
 
             <div>
-                <p><span className="mr-2 dark:text-gray-200">{post.username}</span><span className="dark:text-gray-300">{post.content}</span></p>
+                <p><Link href={`/profile/${post.username}`} className="hover:underline"><span className="mr-2 dark:text-gray-200">{post.username}</span></Link><span className="dark:text-gray-300">{post.content}</span></p>
             </div>
 
             <CommentInput onSubmit={handleAddComment} placeholder="Añade un comentario..." />

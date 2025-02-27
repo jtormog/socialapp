@@ -50,11 +50,15 @@ export default function PostShort({user_id, post, isLikedInitial}) {
     const [commentCount, setCommentCount] = useState(post.num_comments || 0);
 
     const handleAddComment = async (content) => {
+        // Get current user's data from session
+        const sessionResponse = await fetch('/api/auth/session');
+        const userData = await sessionResponse.json();
+
         const newComment = {
             comment_id: Date.now(),
             content,
-            username: post.username,
-            user_picture: post.picture,
+            username: userData.username,
+            user_picture: userData.picture,
             created_at: new Date().toISOString(),
             replies: []
         };
@@ -64,11 +68,15 @@ export default function PostShort({user_id, post, isLikedInitial}) {
     };
 
     const handleReply = async (commentId, content) => {
+        // Get current user's data from session
+        const sessionResponse = await fetch('/api/auth/session');
+        const userData = await sessionResponse.json();
+
         const newReply = {
             comment_id: Date.now(),
             content,
-            username: post.username,
-            user_picture: post.picture,
+            username: userData.username,
+            user_picture: userData.picture,
             created_at: new Date().toISOString()
         };
 
