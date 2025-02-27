@@ -1,6 +1,6 @@
 import PostShort from "@/app/ui/post-short"
 
-export default async ({ posts, user_id, likes }) => {
+export default ({ posts, user_id, likes }) => {
     return (
         <div className="flex flex-col grow items-center gap-16 mt-28">
             {posts.map(post => (

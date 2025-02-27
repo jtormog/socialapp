@@ -1,5 +1,32 @@
 import { sql } from "@vercel/postgres";
 
+export async function getPostsByContent(searchText) {
+    try {
+        const result = await sql`
+            SELECT 
+                p.post_id,
+                p.content,
+                p.url,
+                p.created_at,
+                u.username,
+                u.picture,
+                COUNT(DISTINCT l.like_id) as num_likes,
+                COUNT(DISTINCT c.comment_id) as num_comments
+            FROM posts p
+            LEFT JOIN users u ON p.user_id = u.user_id
+            LEFT JOIN likes l ON p.post_id = l.post_id
+            LEFT JOIN comments c ON p.post_id = c.post_id
+            WHERE LOWER(p.content) LIKE LOWER(${'%' + searchText + '%'})
+            GROUP BY p.post_id, p.content, p.url, p.created_at, u.username, u.picture
+            ORDER BY p.created_at DESC
+        `;
+        return result.rows;
+    } catch (error) {
+        console.error('Error fetching posts by content:', error);
+        throw new Error('Failed to fetch posts');
+    }
+}
+
 export async function getUserById(user_id) {
     if (!user_id) {
         console.error('No user_id provided to getUserById');
